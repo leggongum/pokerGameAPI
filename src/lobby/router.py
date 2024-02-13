@@ -37,7 +37,7 @@ async def create_lobby(lobby: LobbyCreate, response: Response, user: str | None 
 
 
 @router.patch('/{lobby_title}/add')
-async def come_in_to_lobby(password: password, response: Response, lobby_title: str, user: str | None = None):
+async def come_in_lobby(password: password, response: Response, lobby_title: str, user: str | None = None):
     if not db['lobbies'].get(lobby_title):
         return HTTPException(404, detail='Such lobby is not exist.')
     
