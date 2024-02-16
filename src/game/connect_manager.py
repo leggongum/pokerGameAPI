@@ -113,7 +113,7 @@ class ConnectionManager:
         self.max_bet += amount
         self.turn.chips_amount -= amount
 
-        await self.send_update_in_lobby({'type': 'raise', 'amount': amount, 'bet': self.turn.bet, 'chips': self.turn.chips_amount})
+        await self.send_update_in_lobby({'type': 'raise', 'amount': amount, 'bet': self.turn.bet, 'chips': self.turn.chips_amount, 'from': self.turn.name})
         self.call_and_check_count = 1
 
 
