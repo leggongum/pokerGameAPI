@@ -165,7 +165,7 @@ class ConnectionManager:
         
 
     async def get_turn(self):
-        await self.turn.ws.send_json({'type': 'get_turn'})
+        await self.turn.ws.send_json({'type': 'get_turn', 'name': self.turn.name})
 
         await self.event.wait()
         print(f'Response get_turn: {self.action}')
@@ -178,7 +178,6 @@ class ConnectionManager:
             await self.raise_(response['amount'])
         elif action == 'pass':
             await self.pass_()
-
 
 
     def get_next_index_player(self, indx_player):
