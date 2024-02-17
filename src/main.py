@@ -23,3 +23,8 @@ async def add_user(request: Request, call_next):
     request.scope['query_string'] = urlencode(q_params).encode('utf-8')
     return await call_next(request)
 
+
+
+@app.get('/', status_code=200)
+def health_check():
+    return 'Hello!'
