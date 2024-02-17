@@ -51,10 +51,10 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, user_id, user_name):
         await websocket.accept()
         self.players.append(Player(id=user_id, name=user_name, ws=websocket, chips_amount=100, is_in_game=False))
-        await websocket.send_json({'type':'start_info', 'players': [{'chips': player.chips_amount, 'name': player.name, 'bet': player.bet, 'message': player.message if player.message else ''} for player in self.players]})
         if len(self.players) > 1 and not self.is_running:
             self.turn = self.players[0]
             asyncio.create_task(self.game_process(0))
+        await self.send_update_in_lobby({'type':'start_info', 'players': [{'chips': player.chips_amount, 'name': player.name, 'bet': player.bet, 'message': player.message if player.message else ''} for player in self.players]})
 
 
     def disconnect(self, websocket: WebSocket):
