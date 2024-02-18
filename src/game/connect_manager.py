@@ -141,6 +141,7 @@ class ConnectionManager:
             player.max_winnings = sum(min(player.bet, p.bet) for p in self.players)
 
         player_value_list.sort(key=lambda x: x[1], reverse=True)
+        groups = []
         group = []
         value = float('inf')
         for player, v in player_value_list:
@@ -155,13 +156,15 @@ class ConnectionManager:
                         number_winners -= 1
                     if not self.bank:
                         break
+                    groups.append(group.copy())
                     group = [player]
+
                 else:
                     group.append(player)
             else:
                 group.append(player)
         
-        await self.send_update_in_lobby({'type': 'final', 'players_cards': player_cards_map})
+        await self.send_update_in_lobby({'type': 'final', 'players_cards': player_cards_map, 'winners': groups})
         
 
     async def get_turn(self):
@@ -202,7 +205,9 @@ class ConnectionManager:
             if player.chips_amount > 0 and active_players_counter < limit:
                 player.is_in_game = True
                 active_players_counter += 1
-
+        if self.count_active_players() < 2:
+            self.is_running = False
+            return
 
         get_stadies = ConnectionManager.get_stadies()
         phase_func_map = {'preflop': self.send_preflop_info, 
@@ -216,7 +221,7 @@ class ConnectionManager:
             self.call_and_check_count = 0
             while self.count_active_players() > self.call_and_check_count: # пока не все check или call, ход передаётся следующему
                 print(self.count_active_players(), self.call_and_check_count)
-                await asyncio.sleep(5)
+                await asyncio.sleep(1)
                 if self.turn.chips_amount > 0:
                     try:
                         await asyncio.wait_for(self.get_turn(), 60)
@@ -266,14 +271,17 @@ class ConnectionManager:
         self.max_bet = 10
 
         for n, player in enumerate(self.players):
-            if n == len(self.players) -1:
-                player.chips_amount = max(player.chips_amount - 10, 0)
-                player.bet = 10
-            else:
-                player.chips_amount = max(player.chips_amount - 5, 0)
-                player.bet = 5
-            player.cards = self.get_cards_from_deck(2)
-            await player.ws.send_json({'type': 'info',
+            if player.is_in_game:
+                if n == len(self.players) -1:
+                    bb = max(10, player.chips_amount)
+                    player.chips_amount -= bb
+                    player.bet = bb
+                else:
+                    mb = max(5, player.chips_amount)
+                    player.chips_amount -= mb
+                    player.bet = mb
+                player.cards = self.get_cards_from_deck(2)
+                await player.ws.send_json({'type': 'info',
                                     'stage': 'preflop', 
                                     'self_cards': player.cards, 
                                     'chips': player.chips_amount,
