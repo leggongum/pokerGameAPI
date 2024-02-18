@@ -273,11 +273,11 @@ class ConnectionManager:
         for n, player in enumerate(self.players):
             if player.is_in_game:
                 if n == len(self.players) -1:
-                    bb = max(10, player.chips_amount)
+                    bb = max(10, player.chips_amount) if player.chips_amount < 10 else 10
                     player.chips_amount -= bb
                     player.bet = bb
                 else:
-                    mb = max(5, player.chips_amount)
+                    mb = max(5, player.chips_amount) if player.chips_amount < 5 else 5
                     player.chips_amount -= mb
                     player.bet = mb
                 player.cards = self.get_cards_from_deck(2)
