@@ -156,7 +156,7 @@ class ConnectionManager:
                         number_winners -= 1
                     if not self.bank:
                         break
-                    groups.append([{player.name: player.max_winnings // number_winners}  for player in group])
+                    groups.append([{player.name: player.max_winnings // number_winners+1}  for player in group])
                     group = [player]
 
                 else:
