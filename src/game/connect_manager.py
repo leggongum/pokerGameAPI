@@ -154,9 +154,9 @@ class ConnectionManager:
                         player.chips_amount += player.max_winnings // number_winners
                         self.bank -= player.max_winnings // number_winners
                         number_winners -= 1
+                    groups.append([{player.name: player.max_winnings // (number_winners+1)}  for player in group])
                     if not self.bank:
                         break
-                    groups.append([{player.name: player.max_winnings // (number_winners+1)}  for player in group])
                     group = [player]
 
                 else:
@@ -244,6 +244,8 @@ class ConnectionManager:
                 self.max_bet = 0
                 self.bank = 0
                 await asyncio.sleep(10)
+                break
+
         if len(self.players) > 1:
             indx_player = self.get_next_index_player(indx_player)
             await self.game_process(indx_player)
